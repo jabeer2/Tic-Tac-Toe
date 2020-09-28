@@ -7,12 +7,27 @@ import android.view.View;
 import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
+    // 0 for yellow and 1 for red
+    int ActivePlayer = 0;
+    int[] gameState = {2,2,2,2,2,2,2,2,2};
+
 
     public void drop(View view){
         ImageView counter = (ImageView) view;
-        counter.setTranslationY(-1000f);
-        counter.setImageResource(R.drawable.yellowbtn1);
-        counter.animate().translationYBy(1000f).setDuration(300);
+        int tappedCounter = Integer.parseInt(counter.getTag().toString());
+        if (gameState[tappedCounter] == 2) {
+            gameState[tappedCounter] = ActivePlayer;
+            counter.setTranslationY(-1000f);
+            if (ActivePlayer == 0) {
+                counter.setImageResource(R.drawable.yellowbtn1);
+                ActivePlayer = 1;
+            } else {
+                counter.setImageResource(R.drawable.redbtn);
+                ActivePlayer = 0;
+            }
+
+            counter.animate().translationYBy(1000f).setDuration(300);
+        }
     }
 
     @Override
