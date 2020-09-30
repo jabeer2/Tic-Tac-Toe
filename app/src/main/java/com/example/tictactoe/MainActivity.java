@@ -1,6 +1,7 @@
 package com.example.tictactoe;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.gridlayout.widget.GridLayout;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,44 +11,128 @@ import android.widget.TextClock;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    // 0 for yellow and 1 for red
-    int ActivePlayer = 0;
-    int[] gameState = {2,2,2,2,2,2,2,2,2};
-    int[][] Winners = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+    // 0 = yellow, 1 = red
 
+    int activePlayer = 0;
+
+    boolean gameIsActive = true;
+
+    // 2 means unplayed
+
+    int[] gameState = {2, 2, 2, 2, 2, 2, 2, 2, 2};
+
+    int[][] winningPositions = {{0,1,2}, {3,4,5}, {6,7,8}, {0,3,6}, {1,4,7}, {2,5,8}, {0,4,8}, {2,4,6}};
 
     public void drop(View view) {
+
         ImageView counter = (ImageView) view;
+
+
+
         int tappedCounter = Integer.parseInt(counter.getTag().toString());
-        if (gameState[tappedCounter] == 2) {
-            gameState[tappedCounter] = ActivePlayer;
+
+        if (gameState[tappedCounter] == 2 && gameIsActive) {
+
+            gameState[tappedCounter] = activePlayer;
+
             counter.setTranslationY(-1000f);
-            if (ActivePlayer == 0) {
+
+            if (activePlayer == 0) {
+
                 counter.setImageResource(R.drawable.yellowbtn1);
-                ActivePlayer = 1;
+
+                activePlayer = 1;
+
             } else {
+
                 counter.setImageResource(R.drawable.redbtn);
-                ActivePlayer = 0;
+
+                activePlayer = 0;
+
             }
 
-            counter.animate().translationYBy(1000f).setDuration(300);
-            for (int[] winner : Winners) {
-                if (gameState[winner[0]] == gameState[winner[1]] &&
-                        gameState[winner[1]] == gameState[winner[2]] &&
-                        gameState[winner[0]] != 2) {
-                    String win = "Red";
-                    if (gameState[winner[0]] == 0) {
-                        win = "Yellow";
+            counter.animate().translationYBy(1000f).rotation(360).setDuration(300);
+
+            for (int[] winningPosition : winningPositions) {
+
+                if (gameState[winningPosition[0]] == gameState[winningPosition[1]] &&
+                        gameState[winningPosition[1]] == gameState[winningPosition[2]] &&
+                        gameState[winningPosition[0]] != 2) {
+
+                    // Someone has won!
+
+                    gameIsActive = false;
+
+                    String winner = "Red";
+
+                    if (gameState[winningPosition[0]] == 0) {
+
+                        winner = "Yellow";
+
                     }
-                    System.out.println("0" + gameState[winner[0]]);
-                    System.out.println("1" +gameState[winner[1]]);
-                    TextView winnerMsg = (TextView) findViewById(R.id.winnerMsg);
-                    winnerMsg.setText(win + " has won");
-                    LinearLayout playAgainLay = (LinearLayout) findViewById(R.id.plyAgainlay);
-                    playAgainLay.setVisibility(View.VISIBLE);
+
+                    TextView winnerMessage = (TextView) findViewById(R.id.winnerMsg);
+
+                    winnerMessage.setText(winner + " has won!");
+
+                    LinearLayout layout = (LinearLayout)findViewById(R.id.plyAgainlay);
+
+                    layout.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    boolean gameIsOver = true;
+
+                    for (int counterState : gameState) {
+
+                        if (counterState == 2) gameIsOver = false;
+
+                    }
+
+                    if (gameIsOver) {
+
+                        TextView winnerMessage = (TextView) findViewById(R.id.winnerMsg);
+
+                        winnerMessage.setText("It's a draw");
+
+                        LinearLayout layout = (LinearLayout)findViewById(R.id.plyAgainlay);
+
+                        layout.setVisibility(View.VISIBLE);
+
+                    }
+
                 }
+
             }
         }
+
+
+    }
+
+    public void plyAgain(View view) {
+
+        gameIsActive = true;
+
+        LinearLayout layout = (LinearLayout)findViewById(R.id.plyAgainlay);
+
+        layout.setVisibility(View.INVISIBLE);
+
+        activePlayer = 0;
+
+        for (int i = 0; i < gameState.length; i++) {
+
+            gameState[i] = 2;
+
+        }
+
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.gridlay);
+
+        for (int i = 0; i< gridLayout.getChildCount(); i++) {
+
+            ((ImageView) gridLayout.getChildAt(i)).setImageResource(0);
+
+        }
+
     }
 
     @Override
